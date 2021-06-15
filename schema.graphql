@@ -2,4 +2,5 @@ type Gravatar @entity {
   id: ID!
   displayName: String!
   imageUrl: String!
+  zepellin
 }
