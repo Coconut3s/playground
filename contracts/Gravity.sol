@@ -8,6 +8,7 @@ contract GravatarRegistry {
     address owner;
     string displayName;
     string imageUrl;
+    string zed;
   }
 
   Gravatar[] public gravatars;

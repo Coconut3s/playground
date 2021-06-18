@@ -1,22 +1,41 @@
-import { NewGravatar, UpdatedGravatar } from '../generated/Gravity/Gravity'
-import { Gravatar } from '../generated/schema'
+import { BigInt } from "@graphprotocol/graph-ts"
+import { Phantom, Transfer } from '../generated/Phantom/Phantom'
+import { Trade, TradeCount, Owner } from '../generated/schema'
 
-export function handleNewGravatar(event: NewGravatar): void {
-  let gravatar = new Gravatar(event.params.id.toHex())
-  gravatar.owner = event.params.owner
-  gravatar.displayName = event.params.displayName
-  gravatar.imageUrl = event.params.imageUrl
-  gravatar.save()
-}
 
-export function handleUpdatedGravatar(event: UpdatedGravatar): void {
-  let id = event.params.id.toHex()
-  let gravatar = Gravatar.load(id)
-  if (gravatar == null) {
-    gravatar = new Gravatar(id)
+export function handleTransfer(event: Transfer): void {
+  let transfer = Trade.load(event.params._from.toHex())
+
+  if (transfer == null) {
+    transfer = new Trade(event.params._from.toHex())
   }
-  gravatar.owner = event.params.owner
-  gravatar.displayName = event.params.displayName
-  gravatar.imageUrl = event.params.imageUrl
-  gravatar.save()
+
+  transfer.taker = event.params._to
+  transfer.value = event.params._value
+  transfer.save()
+
+  let tradecount = TradeCount.load('singleton')
+
+  if (tradecount == null) {
+    tradecount = new TradeCount('singleton')
+    tradecount.count = 1
+  }
+  else {
+    tradecount.count = tradecount.count + 1
+  }
+
+  tradecount.save()
+
+  let contract = Phantom.bind(event.address)
+
+  let owner = Owner.load(event.params._from.toHex())
+
+  if (owner == null) {
+    owner = new Owner(event.params._from.toHex())
+  }
+
+  owner.balance = contract.balanceOf(event.params._from)
+  owner.save()
+  
 }
+ 

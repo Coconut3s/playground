@@ -1,5 +1,16 @@
-type Gravatar @entity {
+type Trade @entity {
   id: ID!
-  displayName: String!
-  imageUrl: String!
+  taker: Bytes!
+  value: BigInt!
+
+}
+
+type TradeCount @entity {
+  id: ID!
+  count: Int!
+}
+
+type Owner @entity {
+  id: ID!
+  balance: BigInt!
 }
